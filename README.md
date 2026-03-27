@@ -2,19 +2,59 @@
 
 VariantChessReview is a modern, variant-first game analysis platform inspired by WintrChess and powered by Fairy-Stockfish.
 
+## Quick start (run locally)
+
+### Prerequisites
+
+- Node.js 20+
+- npm 10+
+
+### Install
+
+```bash
+npm install
+```
+
+### Run both web + api
+
+```bash
+npm run dev
+```
+
+- Web UI: `http://localhost:5173`
+- API: `http://localhost:4000`
+
+### Run individually
+
+```bash
+npm run dev:web
+npm run dev:api
+```
+
+## How to use the website
+
+1. Open `http://localhost:5173`.
+2. Pick a variant from the selector (`chess`, `atomic`, `crazyhouse`, `xiangqi`).
+3. Paste PGN/notation into the textarea.
+4. Click **Run sample analysis**.
+5. Review move output in the right panel:
+   - engine eval (placeholder until real engine wiring)
+   - best move (placeholder)
+   - move classification (`good/inaccuracy/mistake/blunder`)
+
+> Current build is an MVP scaffold. The WASM engine wrapper and API contract are in place, and real Fairy-Stockfish worker wiring is the next step.
+
 ## 1) Full architecture overview
 
 ### High-level system
 
-- **Frontend (Next.js + React + Tailwind + Zustand)**
+- **Frontend (React + Vite + Zustand)**
   - Imports PGN / variant notation / Fairyground session payloads.
   - Renders variant-capable board and move list.
-  - Runs in-browser Fairy-Stockfish WASM for low-latency analysis.
-  - Streams evals to graph and review UI.
-- **Backend (FastAPI or Node API route equivalent)**
-  - Stores users, games, move comments, evaluations, variant definitions.
-  - Provides sharable review links with privacy controls.
-  - Optional server-side UCI engine workers for heavier analysis.
+  - Uses a review store for comment/rating workflows.
+- **Backend (Node + Express)**
+  - Receives analysis requests and returns batched evaluation payloads.
+  - Will host longer-running UCI worker orchestration.
 - **Engine layer**
   - Unified `AnalysisEngine` interface supports:
     - `wasm` mode (client)
@@ -47,7 +87,6 @@ VariantChessReview is a modern, variant-first game analysis platform inspired by
 apps/
   web/
     src/
-      app/
       components/
         VariantBoard.tsx
       lib/
@@ -57,10 +96,14 @@ apps/
           fairyWorker.ts
       store/
         reviewStore.ts
+      App.tsx
+      main.tsx
+      styles.css
   api/
     src/
       routes/
         analyze.ts
+      server.ts
 prisma/
   schema.prisma
 docs/
@@ -72,7 +115,8 @@ docs/
 - Engine integration: `apps/web/src/lib/engine/fairyWorker.ts`
 - Board rendering: `apps/web/src/components/VariantBoard.tsx`
 - Move evaluation + classification: `apps/web/src/lib/analysis/classifyMove.ts`
-- Backend analysis endpoint skeleton: `apps/api/src/routes/analyze.ts`
+- Backend analysis endpoint: `apps/api/src/routes/analyze.ts`
+- User workflow page: `apps/web/src/App.tsx`
 
 ## 4) Step-by-step implementation plan
 
