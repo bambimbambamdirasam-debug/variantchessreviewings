@@ -1,0 +1,60 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background: #09090b;
+}
+
+body {
+  margin: 0;
+  background: #09090b;
+  color: #f4f4f5;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.leftPane,
+.rightPane {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.card {
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  background: #18181b;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-size: 12px;
+  color: #a1a1aa;
+}
+
+textarea,
+select,
+button {
+  background: #27272a;
+  color: #fafafa;
+  border: 1px solid #3f3f46;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+button {
+  cursor: pointer;
+}
+
+.muted {
+  color: #a1a1aa;
+  margin: 0;
+}

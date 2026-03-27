@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  displayName  String?
+  passwordHash String?
+  createdAt    DateTime @default(now())
+
+  games    Game[]
+  comments Comment[]
+}
+
+model Variant {
+  id           String   @id @default(cuid())
+  key          String   @unique
+  name         String
+  boardWidth   Int
+  boardHeight  Int
+  configString String   @db.Text
+  createdAt    DateTime @default(now())
+
+  games Game[]
+}
+
+model Game {
+  id              String      @id @default(cuid())
+  ownerId         String
+  variantId       String
+  title           String?
+  source          String?
+  isPublic        Boolean     @default(false)
+  importNotation  String?     @db.Text
+  createdAt       DateTime    @default(now())
+
+  owner           User        @relation(fields: [ownerId], references: [id])
+  variant         Variant     @relation(fields: [variantId], references: [id])
+  moves           Move[]
+}
+
+model Move {
+  id             String        @id @default(cuid())
+  gameId         String
+  ply            Int
+  san            String?
+  uci            String?
+  fen            String        @db.Text
+  playedMove     String?
+  bestMove       String?
+  classification MoveClass?
+
+  game           Game          @relation(fields: [gameId], references: [id])
+  evaluations    Evaluation[]
+  comments       Comment[]
+
+  @@unique([gameId, ply])
+}
+
+model Evaluation {
+  id        String   @id @default(cuid())
+  moveId    String
+  depth     Int
+  evalCp    Int?
+  mateIn    Int?
+  multipv   Int      @default(1)
+  line      String   @db.Text
+  createdAt DateTime @default(now())
+
+  move Move @relation(fields: [moveId], references: [id])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  moveId    String
+  authorId  String
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+
+  move   Move @relation(fields: [moveId], references: [id])
+  author User @relation(fields: [authorId], references: [id])
+}
+
+enum MoveClass {
+  brilliant
+  good
+  inaccuracy
+  mistake
+  blunder
+}
